@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<TableApplication>
+  <PackageID>feac7926-9137-4fd5-b73d-1880194a2f08</PackageID>
+  <DisplayName>Bubbles</DisplayName>
+  <ApplicationFolderPath>C:\Users\Clint\Desktop\lispstick\quicklisp\local-projects\bubbles</ApplicationFolderPath>
+  <ApplicationPath>C:\Users\Clint\Desktop\lispstick\quicklisp\local-projects\bubbles\index.html</ApplicationPath>
+  <Dependency>
+    <DependencyName>Table Runtime Environment Extension</DependencyName>
+    <DependencyURL>http://www.smarttech.com/TREE</DependencyURL>
+    <DependencyKey>TREE</DependencyKey>
+    <DependencyVersion>1</DependencyVersion>
+  </Dependency>
+  <Icon/>
+  <ContentFolder/>
+  <CompanyDeveloper>ivy.io</CompanyDeveloper>
+  <CompanyDeveloperURL>ivy.io</CompanyDeveloperURL>
+  <Version>0.0.1</Version>
+  <Description/>
+  <Description_ar/>
+  <Description_da_DK/>
+  <Description_de_DE/>
+  <Description_en_GB/>
+  <Description_es_ES/>
+  <Description_es_MX/>
+  <Description_fr_FR/>
+  <Description_it_IT/>
+  <Description_nl_NL/>
+  <Description_pt_BR/>
+  <Description_ru_RU/>
+  <Description_zh_CN/>
+  <Keywords/>
+  <HasCustomization>false</HasCustomization>
+  <HasPreview>false</HasPreview>
+  <SavePackageTo>C:\Users\Clint\Desktop\out</SavePackageTo>
+</TableApplication>
