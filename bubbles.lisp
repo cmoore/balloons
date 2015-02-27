@@ -36,7 +36,7 @@
 (defmacro+ps _ (function &rest body)
   `(-> _ (,function ,@body)))
 
-(defpsmacro add-balloon ()
+(defmacro+ps add-balloon ()
   (with-ps-gensyms (ball)
     `(progn
        (defvar ,ball (chain game add (sprite 0 0 "balloon")))
