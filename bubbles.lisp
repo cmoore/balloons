@@ -30,9 +30,7 @@
                            :if-exists :supersede)
     (write-string (bubbles) outfile)))
 
-
-
-(defmacro+ps add-balloon ()
+(defpsmacro add-balloon ()
   (with-ps-gensyms (ball)
     `(progn
        (defvar ,ball (chain game add (sprite 0 0 "balloon")))
@@ -49,6 +47,12 @@
        (chain ,ball scale (set 0.5))
        (chain all-balloons (push ,ball))
        (drop-balloon ,ball))))
+
+;; (defpsmacro -> (&rest body)
+;;   `(chain ,@body))
+
+;; (defpsmacro _ (function &rest body)
+;;   `(-> _ (,function ,@body)))
 
 (defun balloons ()
   (ps
@@ -83,16 +87,14 @@
                                             (@ -phaser -c-a-n-v-a-s) "balloons" (create preload preload
                                                                                         create create
                                                                                         update update)))))
-
     (defun update ()
-      
       (chain _ (map all-balloons (lambda (balloon)
                                    (chain _ (map all-balloons
                                                  (lambda (second-balloon)
                                                    (chain game physics arcade (collide balloon second-balloon handle-collision nil this)))))
                                    (when (> -100 (@ balloon position y))
                                      (drop-balloon balloon))
-                                   (when (> -10 (@ balloon position x))
+                                   (when (> -50 (@ balloon position x))
                                      (drop-balloon balloon)))))
       (chain game input on-down (add-once update-score this)))
     
