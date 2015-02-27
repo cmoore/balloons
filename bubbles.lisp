@@ -48,11 +48,11 @@
        (chain all-balloons (push ,ball))
        (drop-balloon ,ball))))
 
-;; (defpsmacro -> (&rest body)
-;;   `(chain ,@body))
+(defpsmacro -> (&rest body)
+  `(chain ,@body))
 
-;; (defpsmacro _ (function &rest body)
-;;   `(-> _ (,function ,@body)))
+(defpsmacro _ (function &rest body)
+  `(-> _ (,function ,@body)))
 
 (defun balloons ()
   (ps
@@ -63,7 +63,7 @@
     (defvar window-height (- (@ window inner-height) 18))
 
     (defun random-range (min max)
-      (+ min (chain -math (floor (* (chain -math (random)) (+ 1 (- max min)))))))
+      (+ min (-> -math (floor (* (-> -math (random)) (+ 1 (- max min)))))))
 
     (defun drop-balloon (the-balloon)
       (setf (@ the-balloon position x) (random-range 1 window-width))
@@ -77,42 +77,40 @@
       (drop-balloon obj))
     
     (defun handle-collision (first second)
-      (setf (chain first body velocity x) 5)
-      (setf (chain second body velocity x) -5))
+      (setf (-> first body velocity x) 5)
+      (setf (-> second body velocity x) -5))
 
     (defun update-score ()
-      (chain score-text (set-text score)))
+      (-> score-text (set-text score)))
     
-    (defvar game (new (chain -phaser (-game window-width window-height
-                                            (@ -phaser -c-a-n-v-a-s) "balloons" (create preload preload
-                                                                                        create create
-                                                                                        update update)))))
+    (defvar game (new (-> -phaser (-game window-width window-height
+                                         (@ -phaser -c-a-n-v-a-s) "balloons" (create preload preload
+                                                                                     create create
+                                                                                     update update)))))
     (defun update ()
-      (chain _ (map all-balloons (lambda (balloon)
-                                   (chain _ (map all-balloons
-                                                 (lambda (second-balloon)
-                                                   (chain game physics arcade (collide balloon second-balloon handle-collision nil this)))))
-                                   (when (> -100 (@ balloon position y))
-                                     (drop-balloon balloon))
-                                   (when (> -50 (@ balloon position x))
-                                     (drop-balloon balloon)))))
-      (chain game input on-down (add-once update-score this)))
+      (_ map all-balloons (lambda (balloon)
+                            (_ map all-balloons (lambda (second-balloon)
+                                                  (-> game physics arcade (collide balloon second-balloon handle-collision nil this))))
+                            (when (> -100 (@ balloon position y))
+                              (drop-balloon balloon))
+                            (when (> -50 (@ balloon position x))
+                              (drop-balloon balloon))))
+      (-> game input on-down (add-once update-score this)))
     
     (defun preload ()
-      (chain game load (image "balloon" "img/balloon_red.png"))
-      (chain game load (image "background" "img/background.jpg")))
+      (-> game load (image "balloon" "img/balloon_red.png"))
+      (-> game load (image "background" "img/background.jpg")))
 
     
     (defun create ()
-      (setf (chain game stage disable-visibility-change) t)
-      (defvar background (chain game add (sprite 0 0 "background")))
-      (setf score-text (chain game add (text 50
-                                             25 "0" (create font "40px Arial"
+      (setf (-> game stage disable-visibility-change) t)
+      (defvar background (-> game add (sprite 0 0 "background")))
+      (setf score-text (-> game add (text 50 25 "0" (create font "40px Arial"
                                                             fill "#ff0044"
                                                             stroke "#fff"
                                                             stroke-thickness 2
                                                             align "center"))))
-      (chain score-text anchor (set-to 0.5 0.5))
+      (-> score-text anchor (set-to 0.5 0.5))
       
       (dotimes (i 100)
         (add-balloon)))))
