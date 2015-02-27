@@ -30,6 +30,12 @@
                            :if-exists :supersede)
     (write-string (bubbles) outfile)))
 
+(defpsmacro -> (&rest body)
+  `(chain ,@body))
+
+(defpsmacro _ (function &rest body)
+  `(-> _ (,function ,@body)))
+
 (defpsmacro add-balloon ()
   (with-ps-gensyms (ball)
     `(progn
@@ -47,12 +53,6 @@
        (chain ,ball scale (set 0.5))
        (chain all-balloons (push ,ball))
        (drop-balloon ,ball))))
-
-(defpsmacro -> (&rest body)
-  `(chain ,@body))
-
-(defpsmacro _ (function &rest body)
-  `(-> _ (,function ,@body)))
 
 (defun balloons ()
   (ps
