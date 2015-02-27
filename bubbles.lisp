@@ -44,61 +44,15 @@
 
 (defun balloons ()
   (ps
-    (defvar all-balloons (new (-array)))
+    (defvar game (new (chain -phaser (-game 800 600 (@ -phaser -c-a-n-v-a-s) "balloons" (create preload preload
+                                                                                                create create)))))
 
-    (defvar normal-scale 0.5)
-    (defvar large-scale 1)
-    
-    (defvar window-width (- (@  window inner-width) 15))
-    (defvar window-height (- (@ window inner-height) 18))
+    (defun preload ()
+      (chain game load (image "balloon" "img/balloon_red.png")))
 
-    (defvar stage (new (chain -p-i-x-i (-stage 0xffffff t))))
-    (setf (@ stage interactive) true)
     
-    (defvar renderer (chain -p-i-x-i (auto-detect-renderer window-width window-height)))
-    (chain document body (append-child (chain renderer view)))
+    (defun create ()
     
-    (request-anim-frame animate)
-    
-    (defvar background (chain -p-i-x-i -sprite (from-image "img/background.jpg")))
-    (chain stage (add-child background))
-    
-    (defvar balloon-texture (chain -p-i-x-i -texture (from-image "img/balloon_red.png")))
-    (defvar balloon-clicked-texture (chain -p-i-x-i -texture (from-image "img/balloon_red_clicked.png")))
-    
-    
-
-    (defun random-range (min max)
-      (+ min (chain -math (floor (* (chain -math (random)) (+ 1 (- max min)))))))
-
-    (defun drop-balloon (the-balloon)
-      (setf (@ the-balloon position x) (random-range 1 window-width))
-      (setf (@ the-balloon position y) (random-range window-height 5000)))
-
-    (defun are-colliding (first second)
-      (chain first (get-local-bounds) (contains second.x second.y)))
-    (defun is-collision (first second)
-      (not (or (> second.x (+ first.x first.width))
-               (< (+ second.x second.width) first.x)
-               (> second.y (+ first.y first.height))
-               (< (+ second.y second.height) first.y))))
-    
-    (defun animate ()
-      (chain _ (map all-balloons (lambda (first-balloon)
-                                   (chain _ (map all-balloons (lambda (second-balloon)
-                                                                (if (are-colliding first-balloon second-balloon)
-                                                                    (set-texture first-balloon balloon-clicked-texture)
-                                                                    (set-texture first-balloon balloon-texture)))))
-                                   
-                                   (when (> -100 (@ first-balloon position y))
-                                     (drop-balloon first-balloon))
-                                   
-                                   (setf (@ first-balloon position y) (- (@ first-balloon position y) .5))
-                                   
-                                   (when (> -10 (@ first-balloon position x))
-                                     (drop-balloon first-balloon)))))
-      (chain renderer (render stage))
-      (request-anim-frame animate))
-    
-    (dotimes (x 100)
-      (make-balloon))))
+      (defvar balloon (chain game add (sprite 0 0 "balloon")))
+      (chain game physics (enable balloon (chain -phaser -physics -a-r-c-a-d-e)))
+      (setf (chain balloon body velocity y) 20))))
