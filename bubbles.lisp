@@ -77,7 +77,7 @@
       (setf score (+ score 1))
       (update-score)
       (drop-balloon obj)
-      (-> fx (play "pop")))
+      (-> popfx (play "pop")))
     
     (defun handle-collision (first second)
       (setf (-> first body velocity x) 10)
@@ -94,6 +94,7 @@
                                          (@ -phaser -c-a-n-v-a-s) "balloons" (create preload preload
                                                                                      create create
                                                                                      update update)))))
+
     (defun update ()
       (_ map all-balloons (lambda (balloon)
                             (_ map all-balloons (lambda (second-balloon)
@@ -107,9 +108,9 @@
     (defun preload ()
       (-> game load (image "balloon" "img/balloon_red.png"))
       (-> game load (image "background" "img/background.jpg"))
-      (-> game load (audio "pop" "snd/pop.ogg")))
-
-    
+      (-> game load (audio "popfx" "snd/pop.ogg"))
+      (-> game load (audio "sheepfx" "snd/sheep.ogg")))
+        
     (defun create ()
       (setf (-> game stage disable-visibility-change) t)
       (defvar background (-> game add (sprite 0 0 "background")))
@@ -120,9 +121,14 @@
                                                             align "center"))))
       (-> score-text anchor (set-to 0.5 0.5))
 
-      (setf fx (-> game add (audio "pop")))
-      (setf (-> fx allow-multiple) t)
+      (setf popfx (-> game add (audio "popfx")))
+      (setf sheepfx (-> game add (audio "sheepfx")))
+
+      (-> popfx (add-marker "pop" 0 100))
+      (-> sheepfx (add-marker "sheep" 0 100))
       
+      (setf (-> popfx allow-multiple) t)
+      (setf (-> sheepfx allow-multiple) t)
       
       (dotimes (i 100)
         (add-balloon)))))
