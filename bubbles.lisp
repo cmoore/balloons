@@ -36,10 +36,10 @@
 (defmacro+ps _ (function &rest body)
   `(-> _ (,function ,@body)))
 
-(defmacro+ps add-balloon ()
+(defmacro+ps add-entity (texture)
   (with-ps-gensyms (ball)
     `(progn
-       (defvar ,ball (chain game add (sprite 0 0 "balloon")))
+       (defvar ,ball (chain game add (sprite 0 0 ,texture)))
        
        (chain game physics (enable ,ball (chain -phaser -physics -a-r-c-a-d-e)))
        (setf (@ ,ball check-world-bounds) t)
@@ -49,7 +49,9 @@
        (chain ,ball events on-input-down (add click-handler ,ball))
        
        (setf (chain ,ball body velocity y) (random-range -20 -50))
-      
+
+       (setf (-> ,ball itexture) ,texture)
+       
        (chain ,ball scale (set 0.5))
        (chain all-balloons (push ,ball))
        (drop-balloon ,ball))))
@@ -77,7 +79,13 @@
       (setf score (+ score 1))
       (update-score)
       (drop-balloon obj)
-      (-> popfx (play "pop")))
+
+      (when (= (-> obj itexture) "roo")
+        (-> boingfx (play "boing")))
+      (when (= (-> obj itexture) "daisy")
+        (-> boingfx (play "boing")))
+      (when (= (-> obj itexture) "balloon")
+        (-> popfx (play "pop"))))
     
     (defun handle-collision (first second)
       (setf (-> first body velocity x) 10)
@@ -108,12 +116,19 @@
     (defun preload ()
       (-> game load (image "balloon" "img/balloon_red.png"))
       (-> game load (image "background" "img/background.jpg"))
+      (-> game load (image "daisy" "img/daisy.png"))
+      (-> game load (image "roo" "img/roo.png"))
+      
       (-> game load (audio "popfx" "snd/pop.ogg"))
+      (-> game load (audio "boingfx" "snd/boing.ogg"))
       (-> game load (audio "sheepfx" "snd/sheep.ogg")))
         
     (defun create ()
       (setf (-> game stage disable-visibility-change) t)
+      
       (defvar background (-> game add (sprite 0 0 "background")))
+      (-> background scale (set 1.5))
+      
       (setf score-text (-> game add (text 50 25 "0" (create font "40px Arial"
                                                             fill "#ff0044"
                                                             stroke "#fff"
@@ -123,12 +138,19 @@
 
       (setf popfx (-> game add (audio "popfx")))
       (setf sheepfx (-> game add (audio "sheepfx")))
-
+      (setf boingfx (-> game add (audio "boingfx")))
+      
       (-> popfx (add-marker "pop" 0 100))
       (-> sheepfx (add-marker "sheep" 0 100))
+      (-> boingfx (add-marker "boing" 0 100))
       
       (setf (-> popfx allow-multiple) t)
-      (setf (-> sheepfx allow-multiple) t)
+      (setf (-> sheepfx allow-multiple) nil)
+      (setf (-> boingfx allow-multiple) nil)
       
-      (dotimes (i 100)
-        (add-balloon)))))
+      (dotimes (i 50)
+        (add-entity "balloon"))
+      (dotimes (i 25)
+        (add-entity "daisy"))
+      (dotimes (i 25)
+        (add-entity "roo")))))
