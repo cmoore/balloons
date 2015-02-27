@@ -25,10 +25,10 @@
   (balloons))
 
 (defun write-javascript ()
-  (with-open-file (outfile (format nil "~abubbles.js" (cl-ivy:resource-path "."))
+  (with-open-file (outfile (format nil "~aballoons.js" (cl-ivy:resource-path "."))
                            :direction :output
                            :if-exists :supersede)
-    (write-string (bubbles) outfile)))
+    (write-string (balloons) outfile)))
 
 (defmacro+ps -> (&rest body)
   `(chain ,@body))
