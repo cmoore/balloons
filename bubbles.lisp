@@ -30,10 +30,10 @@
                            :if-exists :supersede)
     (write-string (bubbles) outfile)))
 
-(defpsmacro -> (&rest body)
+(defmacro+ps -> (&rest body)
   `(chain ,@body))
 
-(defpsmacro _ (function &rest body)
+(defmacro+ps _ (function &rest body)
   `(-> _ (,function ,@body)))
 
 (defpsmacro add-balloon ()
@@ -48,7 +48,7 @@
        (setf (chain ,ball input-enabled) t)
        (chain ,ball events on-input-down (add click-handler ,ball))
        
-       (setf (chain ,ball body velocity y) (random-range -10 -20))
+       (setf (chain ,ball body velocity y) (random-range -20 -50))
       
        (chain ,ball scale (set 0.5))
        (chain all-balloons (push ,ball))
@@ -58,6 +58,8 @@
   (ps
     (defvar score 0)
     (defvar score-text)
+    (defvar fx)
+
     
     (defvar window-width (- (@  window inner-width) 15))
     (defvar window-height (- (@ window inner-height) 18))
@@ -74,14 +76,19 @@
     (defun click-handler (obj)
       (setf score (+ score 1))
       (update-score)
-      (drop-balloon obj))
+      (drop-balloon obj)
+      (-> fx (play "pop")))
     
     (defun handle-collision (first second)
-      (setf (-> first body velocity x) 5)
-      (setf (-> second body velocity x) -5))
+      (setf (-> first body velocity x) 10)
+      (setf (-> second body velocity x) -10))
 
     (defun update-score ()
       (-> score-text (set-text score)))
+
+    (defun alter-speed (amount)
+      (_ map all-balloons (lambda (balloon)
+                            (setf (-> balloon body velocity y) amount))))
     
     (defvar game (new (-> -phaser (-game window-width window-height
                                          (@ -phaser -c-a-n-v-a-s) "balloons" (create preload preload
@@ -99,7 +106,8 @@
     
     (defun preload ()
       (-> game load (image "balloon" "img/balloon_red.png"))
-      (-> game load (image "background" "img/background.jpg")))
+      (-> game load (image "background" "img/background.jpg"))
+      (-> game load (audio "pop" "snd/pop.ogg")))
 
     
     (defun create ()
@@ -111,6 +119,10 @@
                                                             stroke-thickness 2
                                                             align "center"))))
       (-> score-text anchor (set-to 0.5 0.5))
+
+      (setf fx (-> game add (audio "pop")))
+      (setf (-> fx allow-multiple) t)
+      
       
       (dotimes (i 100)
         (add-balloon)))))
