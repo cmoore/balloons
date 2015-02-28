@@ -1,7 +1,7 @@
 ;;;; bubbles.asd
 
-(asdf:defsystem #:bubbles
-  :description "Describe bubbles here"
+(asdf:defsystem #:balloons
+  :description "Describe balloons here"
   :author "Your Name <your.name@example.com>"
   :license "Specify license here"
   :serial t
@@ -9,5 +9,5 @@
                #:hunchentoot
                #:cl-ivy)
   :components ((:file "package")
-               (:file "bubbles")))
+               (:file "balloons")))
 

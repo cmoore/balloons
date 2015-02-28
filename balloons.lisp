@@ -1,9 +1,14 @@
-(in-package #:bubbles)
+(in-package #:balloons)
 
 (defvar *listener* nil)
 
+
+(defun reset-dispatch-table ()
+  (setf *dispatch-table* (list #'dispatch-easy-handlers)))
+
 (defun start-server ()
   (unless *listener*
+    (reset-dispatch-table)
     (setf *listener* (make-instance 'hunchentoot:easy-acceptor
                                     :document-root (cl-ivy:resource-path ".")
                                     :port 8080))
@@ -13,22 +18,14 @@
   (when *listener*
     (hunchentoot:stop *listener*)))
 
-(defun reset-dispatch-table ()
-  (setf *dispatch-table* (list #'dispatch-easy-handlers)))
-
-(define-easy-handler (serve-ps-js :uri "/psjs") ()
-  (setf (content-type*) "text/javascript")
-  (ps* *ps-lisp-library*))
-
-(define-easy-handler (serve-js :uri "/js") ()
-  (setf (content-type*) "text/javascript")
-  (balloons))
 
 (defun write-javascript ()
   (with-open-file (outfile (format nil "~aballoons.js" (cl-ivy:resource-path "."))
                            :direction :output
                            :if-exists :supersede)
     (write-string (balloons) outfile)))
+
+
 
 (defmacro+ps -> (&rest body)
   `(chain ,@body))
@@ -164,3 +161,7 @@
         (add-entity "daisy"))
       (dotimes (i 25)
         (add-entity "roo")))))
+
+(define-easy-handler (serve-js :uri "/balloons.js") ()
+  (setf (content-type*) "text/javascript")
+  (balloons))

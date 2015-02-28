@@ -1,6 +1,5 @@
-;;;; package.lisp
 
-(defpackage #:bubbles
+(defpackage #:balloons
   (:use #:cl
         #:hunchentoot
         #:parenscript

@@ -1,6 +1,6 @@
 
-(ql:quickload 'bubbles)
+(ql:quickload 'balloons)
 (ql:quickload 'swank)
 (swank:create-server :port 4005 :dont-close t)
-(in-package :bubbles)
+(in-package :balloons)
 (start-server)
