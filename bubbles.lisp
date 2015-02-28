@@ -40,7 +40,7 @@
   (with-ps-gensyms (ball)
     `(progn
        (defvar ,ball (chain game add (sprite 0 0 ,texture)))
-       
+
        (chain game physics (enable ,ball (chain -phaser -physics -a-r-c-a-d-e)))
        (setf (@ ,ball check-world-bounds) t)
        (chain ,ball body bounce (set 1))
@@ -52,7 +52,6 @@
 
        (setf (-> ,ball itexture) ,texture)
        
-       (chain ,ball scale (set 0.5))
        (chain all-balloons (push ,ball))
        (drop-balloon ,ball))))
 
@@ -71,7 +70,11 @@
 
     (defun drop-balloon (the-balloon)
       (setf (@ the-balloon position x) (random-range 1 window-width))
-      (setf (@ the-balloon position y) (random-range window-height 2000)))
+      (setf (@ the-balloon position y) (random-range window-height 2000))
+      (when (string= (@ the-balloon itexture) "balloon")
+        (-> the-balloon scale (set 0.5)))
+       (when (string= (@ the-balloon itexture) "roo")
+         (-> the-balloon scale (set .75))))
     
     (defvar all-balloons (new (-array)))
 
@@ -105,6 +108,12 @@
 
     (defun update ()
       (_ map all-balloons (lambda (balloon)
+
+                            (when (-> balloon to_reset)
+                              (if (< 5 (-> balloon to_reset))
+                                  (drop-balloon balloon)
+                                  (setf (-> balloon to_reset) (+ (-> balloon to_reset) 1))))
+                            
                             (_ map all-balloons (lambda (second-balloon)
                                                   (-> game physics arcade (collide balloon second-balloon handle-collision nil this))))
                             (when (> -100 (@ balloon position y))
@@ -115,6 +124,7 @@
     
     (defun preload ()
       (-> game load (image "balloon" "img/balloon_red.png"))
+      (-> game load (image "balloon-clicked" "img/balloon_red_clicked.png"))
       (-> game load (image "background" "img/background.jpg"))
       (-> game load (image "daisy" "img/daisy.png"))
       (-> game load (image "roo" "img/roo.png"))
