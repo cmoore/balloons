@@ -50,6 +50,20 @@
        (chain all-balloons (push ,ball))
        (drop-balloon ,ball))))
 
+(defmacro with-page (&rest body)
+  `(cl-who:with-html-output-to-string
+       (*standard-output* nil :prologue t :indent t)
+     (htm ,@body)))
+
+(define-easy-handler (balloons-handler :uri "/balloons") ()
+  (with-page
+      (:html :lang "en"
+        (:head
+          (:script :src "js/phaser.js")
+          (:script :src "js/underscore-min.js"))
+        (:body :style "background-color:#eee;"
+          (:script :src "/balloons.js")))))
+
 (defun balloons ()
   (ps
     (defvar score 0)

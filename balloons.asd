@@ -7,6 +7,7 @@
   :serial t
   :depends-on (#:parenscript
                #:hunchentoot
+               #:cl-who
                #:cl-ivy)
   :components ((:file "package")
                (:file "balloons")))
