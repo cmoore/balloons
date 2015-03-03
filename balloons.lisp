@@ -50,6 +50,9 @@
        (chain all-balloons (push ,ball))
        (drop-balloon ,ball))))
 
+(defmacro+ps random-range (min max)
+  `(+ ,min (-> -math (floor (* (-> -math (random)) (+ 1 (- ,max ,min)))))))
+
 (defmacro with-page (&rest body)
   `(cl-who:with-html-output-to-string
        (*standard-output* nil :prologue t :indent t)
@@ -74,8 +77,6 @@
     (defvar window-width (- (@  window inner-width) 15))
     (defvar window-height (- (@ window inner-height) 18))
 
-    (defun random-range (min max)
-      (+ min (-> -math (floor (* (-> -math (random)) (+ 1 (- max min)))))))
 
     (defun drop-balloon (the-balloon)
       (setf (@ the-balloon position x) (random-range 1 window-width))
@@ -150,3 +151,47 @@
 (define-easy-handler (serve-js :uri "/balloons.js") ()
   (setf (content-type*) "text/javascript")
   (balloons))
+
+
+(define-easy-handler (shapes-handler :uri "/shapes") ()
+  (with-page
+      (:html :lang "en"
+        (:head
+          (:script :src "js/phaser.js")
+          (:script :src "js/underscore-min.js"))
+        (:body :style "background-color: #eee;"
+          (:script :src "/shapes.js")))))
+
+(define-easy-handler (shapes-js :uri "/shapes.js") ()
+  (setf (content-type*) "text/javascript")
+  (ps
+    (defvar score 0)
+    (defvar score-text nil)
+    (defvar fx)
+
+    (defvar window-width (- (@ window inner-width) 15))
+    (defvar window-height (- (@ window inner-height) 18))
+
+    (defvar all-shapes (new (-array)))
+    
+    
+    (defvar game (new (-> -phaser (-game window-width window-height
+                                         (@ -phaser -c-a-n-v-a-s) "shapes" (create preload preload
+                                                                                   create create
+                                                                                   update update)))))
+
+    (defun preload ()
+      (-> game load (image "background" "img/background.jpg")))
+    
+    (defun create ()
+      (setf (-> game disable-visibility-change) t)
+      (defvar background (-> game add (sprite 0 0 "background")))
+      (-> background scale (set 1.50))
+
+      (let ((garphs (-> game add (graphics 0 0))))
+        (-> garphs (begin-fill  ))
+        (-> garphs (draw-rect 10 10 20 20))
+        (-> garphs (end-fill))))
+
+    
+    (defun update ())))
