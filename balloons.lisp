@@ -1,31 +1,5 @@
 (in-package #:balloons)
 
-(defvar *listener* nil)
-
-
-(defun reset-dispatch-table ()
-  (setf *dispatch-table* (list #'dispatch-easy-handlers)))
-
-(defun start-server ()
-  (unless *listener*
-    (reset-dispatch-table)
-    (setf *listener* (make-instance 'hunchentoot:easy-acceptor
-                                    :document-root (cl-ivy:resource-path ".")
-                                    :port 8080))
-    (hunchentoot:start *listener*)))
-
-(defun stop-server ()
-  (when *listener*
-    (hunchentoot:stop *listener*)))
-
-
-(defun write-javascript ()
-  (with-open-file (outfile (format nil "~aballoons.js" (cl-ivy:resource-path "."))
-                           :direction :output
-                           :if-exists :supersede)
-    (write-string (balloons) outfile)))
-
-
 (eval-when (:compile-toplevel :load-toplevel)
   
   (defmacro+ps -> (&rest body)
@@ -53,6 +27,31 @@
 
   (defmacro+ps random-range (min max)
     `(+ ,min (-> -math (floor (* (-> -math (random)) (+ 1 (- ,max ,min))))))))
+
+(defvar *listener* nil)
+
+(defun reset-dispatch-table ()
+  (setf *dispatch-table* (list #'dispatch-easy-handlers)))
+
+(defun start-server ()
+  (unless *listener*
+    (reset-dispatch-table)
+    (setf *listener* (make-instance 'hunchentoot:easy-acceptor
+                                    :document-root (cl-ivy:resource-path ".")
+                                    :port 8080))
+    (hunchentoot:start *listener*)))
+
+(defun stop-server ()
+  (when *listener*
+    (hunchentoot:stop *listener*)))
+
+
+(defun write-javascript ()
+  (with-open-file (outfile (format nil "~aballoons.js" (cl-ivy:resource-path "."))
+                           :direction :output
+                           :if-exists :supersede)
+    (write-string (balloons) outfile)))
+
 
 (defmacro with-page (&rest body)
   `(cl-who:with-html-output-to-string
@@ -169,30 +168,47 @@
     (defvar score 0)
     (defvar score-text nil)
     (defvar fx)
-
+    (defvar colors (array "0xE6E2AF" "0xA7A37E" "0xEFECCA" "0x046380" "0x002F2F"))
+    
     (defvar window-width (- (@ window inner-width) 15))
     (defvar window-height (- (@ window inner-height) 18))
 
     (defvar all-shapes (new (-array)))
     
     
-    (defvar game (new (-> -phaser (-game window-width window-height
-                                         (@ -phaser -c-a-n-v-a-s) "shapes" (create preload preload
-                                                                                   create create
-                                                                                   update update)))))
+    (defvar game  (new (-> -phaser (-game window-width window-height
+                                          (@ -phaser -c-a-n-v-a-s) "shapes" (create preload preload
+                                                                                    create create
+                                                                                    update update)))))
 
+    (defun draw-shape (stype)
+      (let ((garphs (-> game add (graphics 0 0)))
+            (width (/ window-width 2))
+            (height (/ window-height 2)))
+        (-> garphs (line-style 1 "0x046380" 1))
+        (-> garphs (begin-fill "0xEFECCA" 1))
+        
+        (when (string= stype "square")
+          (-> garphs (draw-rect width height "150" "150")))
+        
+        (when (string= stype "circle")
+          (-> garphs (draw-circle width height "100")))
+        
+        (-> garphs (end-fill))
+        (setf (-> garphs input-enabled) t)
+        (-> garphs input (enable-drag false t))))
+
+    
     (defun preload ()
       (-> game load (image "background" "img/background.jpg")))
-    
+
     (defun create ()
       (setf (-> game disable-visibility-change) t)
+      
       (defvar background (-> game add (sprite 0 0 "background")))
       (-> background scale (set 1.50))
-
-      (let ((garphs (-> game add (graphics 0 0))))
-        (-> garphs (begin-fill  ))
-        (-> garphs (draw-rect 10 10 20 20))
-        (-> garphs (end-fill))))
-
+      
+      (draw-shape "circle")
+      (draw-shape "square"))
     
     (defun update ())))
